@@ -26,7 +26,7 @@ script:
   - npm run build-ngh
 
 after_success:
-  - ngh --repo="$GITHUB_ORG/$GITHUB_NAME/$REPO_NAME.git" --name="$GITHUB_NAME" --email="$GITHUB_EMAIL" --dir=dist/ng-rxjs-state-management-demo --no-silent
+  - ngh --repo="$GITHUB_ORG/$GITHUB_NAME/$REPO_NAME.git" --name="$GITHUB_NAME" --email="$GITHUB_EMAIL" --dir=dist/ng-virtual-scroll-demo --no-silent
 
 branches:
   only:
