@@ -21,7 +21,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.photos$ = this.page$.pipe(
-      concatMap(pageNumber => this.photosService.getBatch$(pageNumber)),
+      concatMap(pageNumber => this.photosService.getBatch$(pageNumber, 8)),
       scan((acc, photos) => [...acc, ...photos], []),
     );
   }
