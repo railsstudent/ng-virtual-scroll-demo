@@ -10,15 +10,7 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
     <ng-container *ngIf="(photos$ | async) as photos">
       <cdk-virtual-scroll-viewport #viewport class="viewport" [itemSize]="250" (scrolledIndexChange)="checkScrollEnd($event)">
         <div *cdkVirtualFor="let photo of photos; trackBy: index">
-          <div class="item">
-            <div class="item-detail">Album Id: {{ photo.albumId }}</div>
-            <div class="item-detail">Id: {{ photo.id }}</div>
-            <div class="item-detail">Url: {{ photo.url }}</div>
-            <div class="item-thumbnailUrl">
-              <span>Thumbnail:</span>
-              <img src="{{ photo.thumbnailUrl }}" alt="{{ photo.thumbnailUrl }}" />
-            </div>
-          </div>
+          <app-virtual-scroll-list-item [photo]="photo"></app-virtual-scroll-list-item>
         </div>
       </cdk-virtual-scroll-viewport>
     </ng-container>
@@ -30,38 +22,13 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
         height: 100%;
         color: black;
       }
-
-      .item {
-        width: calc(100% - 1rem);
-        border-radius: 3px;
-        border: 3px dashed #9a9a9a;
-        padding: 10px;
-        margin-bottom: 5px;
-      }
-
-      .item-detail {
-        height: 20px;
-      }
-
-      .item-thumbnailUrl {
-        height: 150px;
-        width: 150px;
-
-        display: flex;
-      }
-
-      .item-thumbnailUrl > span {
-        margin-right: 20px;
-      }
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VirtualScrollListComponent implements OnInit {
   photos$: Observable<IPhoto[]>;
-
   pageOffset = 0;
-
   nextPage$ = new BehaviorSubject<boolean>(true);
 
   @ViewChild(CdkVirtualScrollViewport)
