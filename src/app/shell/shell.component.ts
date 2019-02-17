@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'app-shell',
@@ -7,8 +6,8 @@ import { Router } from '@angular/router';
     <mat-sidenav-container>
       <mat-sidenav #sidenav mode="side" opened>
         <mat-nav-list>
-          <a mat-list-item routerLink="/list">Virtual Scroll List (TBA)</a>
-          <a mat-list-item routerLink="/list">Virtual Scroll Table (TBD)</a>
+          <a mat-list-item routerLink="/list">Virtual Scroll List</a>
+          <a mat-list-item routerLink="/list">Virtual Scroll Table</a>
         </mat-nav-list>
       </mat-sidenav>
       <mat-sidenav-content>
@@ -34,6 +33,9 @@ import { Router } from '@angular/router';
 
       mat-sidenav {
         background: lightcoral;
+        width: 180px;
+        min-width: 180px;
+        max-width: 300px;
       }
 
       mat-sidenav-content {
@@ -47,10 +49,4 @@ import { Router } from '@angular/router';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ShellComponent implements OnInit {
-  constructor(private router: Router) {}
-
-  ngOnInit() {
-    this.router.navigate(['list']);
-  }
-}
+export class ShellComponent {}

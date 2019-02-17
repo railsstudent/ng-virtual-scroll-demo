@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -15,7 +15,7 @@ export class PhotosService {
   getBatch$(page = 1, limit = 10) {
     const paginatedURL = `${URL}?_page=${page}&_limit=${limit}`;
     return this.http.get<IPhoto[]>(paginatedURL).pipe(
-      catchError(err => {
+      catchError((err: HttpErrorResponse) => {
         console.error(err);
         return of([] as IPhoto[]);
       }),

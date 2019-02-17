@@ -4,7 +4,7 @@ import { VirtualScrollListComponent } from './virtual-scroll-list/virtual-scroll
 
 const routes: Routes = [
   {
-    path: 'list',
+    path: '',
     component: VirtualScrollListComponent,
   },
 ];
