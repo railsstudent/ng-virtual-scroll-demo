@@ -1,12 +1,16 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, TestBed } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
+import { MaterialModule } from './material.module';
+import { ShellComponent } from './shell/shell.component';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [AppComponent],
-      imports: [HttpClientTestingModule],
+      declarations: [AppComponent, ShellComponent],
+      imports: [HttpClientTestingModule, MaterialModule, RouterTestingModule, NoopAnimationsModule],
     }).compileComponents();
   }));
 

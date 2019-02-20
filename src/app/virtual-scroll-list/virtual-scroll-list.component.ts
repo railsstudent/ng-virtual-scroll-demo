@@ -8,7 +8,7 @@ import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
   selector: 'app-virtual-scroll-list',
   template: `
     <ng-container *ngIf="(photos$ | async) as photos">
-      <cdk-virtual-scroll-viewport #viewport class="viewport" [itemSize]="250" (scrolledIndexChange)="checkScrollEnd($event)">
+      <cdk-virtual-scroll-viewport #viewport class="viewport" [itemSize]="260" (scrolledIndexChange)="checkScrollEnd($event)">
         <div *cdkVirtualFor="let photo of photos; let i = index; trackBy: trackByIdx">
           <app-virtual-scroll-list-item [photo]="photo"></app-virtual-scroll-list-item>
         </div>
