@@ -4,3 +4,7 @@ export interface IPhoto {
   url: string;
   thumbnailUrl: string;
 }
+
+export interface PhotoMap {
+  [id: string]: IPhoto;
+}

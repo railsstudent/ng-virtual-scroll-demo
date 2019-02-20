@@ -1,15 +1,15 @@
-import { ChangeDetectionStrategy, Component, ViewChild, OnInit } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { concatMap, tap } from 'rxjs/operators';
-import { IPhoto, PhotosService } from '../services/photos-service';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { concatMap, map, scan, tap, throttleTime } from 'rxjs/operators';
+import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
 
 @Component({
   selector: 'app-virtual-scroll-list',
   template: `
     <ng-container *ngIf="(photos$ | async) as photos">
       <cdk-virtual-scroll-viewport #viewport class="viewport" [itemSize]="250" (scrolledIndexChange)="checkScrollEnd($event)">
-        <div *cdkVirtualFor="let photo of photos; trackBy: index">
+        <div *cdkVirtualFor="let photo of photos; let i = index; trackBy: trackByIdx">
           <app-virtual-scroll-list-item [photo]="photo"></app-virtual-scroll-list-item>
         </div>
       </cdk-virtual-scroll-viewport>
@@ -28,7 +28,7 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 })
 export class VirtualScrollListComponent implements OnInit {
   photos$: Observable<IPhoto[]>;
-  pageOffset = 0;
+  pageOffset = 1;
   nextPage$ = new BehaviorSubject<boolean>(true);
 
   @ViewChild(CdkVirtualScrollViewport)
@@ -37,14 +37,40 @@ export class VirtualScrollListComponent implements OnInit {
   constructor(private service: PhotosService) {}
 
   ngOnInit() {
-    this.photos$ = this.nextPage$.asObservable().pipe(
-      concatMap(() => this.service.getBatch$(this.pageOffset, 8)),
-      tap(() => {
-        if (this.viewport) {
-          // console.log('scroll to index', this.pageOffset * 8);
-          // this.viewport.scrollToIndex(this.pageOffset * 8);
-          this.pageOffset = this.pageOffset + 1;
-        }
+    const batchMap$ = this.nextPage$.asObservable().pipe(
+      throttleTime(500),
+      concatMap(() => this.getBatch$()),
+      scan((acc: PhotoMap, results: PhotoMap) => ({ ...acc, ...results }), {} as PhotoMap),
+      tap(results => {
+        console.log(results);
+        this.pageOffset = this.pageOffset + 1;
+        console.log('next page offset', this.pageOffset);
+      }),
+    );
+
+    this.photos$ = batchMap$.pipe(
+      map((v: PhotoMap) => {
+        return Object.keys(v).reduce(
+          (acc, k) => {
+            acc = acc.concat(v[k]);
+            return acc;
+          },
+          [] as IPhoto[],
+        );
+      }),
+    );
+  }
+
+  getBatch$() {
+    return this.service.getBatch$(this.pageOffset, 10).pipe(
+      map((results: IPhoto[]) => {
+        return results.reduce(
+          (acc, r) => {
+            acc[r.id] = r;
+            return acc;
+          },
+          {} as PhotoMap,
+        );
       }),
     );
   }
@@ -52,11 +78,13 @@ export class VirtualScrollListComponent implements OnInit {
   checkScrollEnd(e) {
     const numItems = this.viewport.getDataLength();
     const end = this.viewport.getRenderedRange().end;
-    console.log('a', numItems);
-    console.log('b', end);
-
+    console.log(`numItems: ${numItems}, end: ${end}`);
     if (end === numItems) {
       this.nextPage$.next(true);
     }
+  }
+
+  trackByIdx(i) {
+    return i;
   }
 }
