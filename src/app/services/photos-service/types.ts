@@ -3,6 +3,7 @@ export interface IPhoto {
   id: number;
   url: string;
   thumbnailUrl: string;
+  title: string;
 }
 
 export interface PhotoMap {

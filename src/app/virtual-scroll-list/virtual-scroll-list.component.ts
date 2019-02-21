@@ -8,7 +8,7 @@ import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
   selector: 'app-virtual-scroll-list',
   template: `
     <ng-container *ngIf="(photos$ | async) as photos">
-      <cdk-virtual-scroll-viewport #viewport class="viewport" [itemSize]="250" (scrolledIndexChange)="checkScrollEnd($event)">
+      <cdk-virtual-scroll-viewport #viewport class="viewport" [itemSize]="240" (scrolledIndexChange)="checkScrollEnd($event)">
         <div *cdkVirtualFor="let photo of photos; let i = index; trackBy: trackByIdx">
           <app-virtual-scroll-list-item [photo]="photo"></app-virtual-scroll-list-item>
         </div>
@@ -41,11 +41,7 @@ export class VirtualScrollListComponent implements OnInit {
       throttleTime(500),
       concatMap(() => this.getBatch$()),
       scan((acc: PhotoMap, results: PhotoMap) => ({ ...acc, ...results }), {} as PhotoMap),
-      tap(results => {
-        console.log(results);
-        this.pageOffset = this.pageOffset + 1;
-        console.log('next page offset', this.pageOffset);
-      }),
+      tap(() => (this.pageOffset = this.pageOffset + 1)),
     );
 
     this.photos$ = batchMap$.pipe(
@@ -78,7 +74,6 @@ export class VirtualScrollListComponent implements OnInit {
   checkScrollEnd(e) {
     const numItems = this.viewport.getDataLength();
     const end = this.viewport.getRenderedRange().end;
-    console.log(`numItems: ${numItems}, end: ${end}`);
     if (end === numItems) {
       this.nextPage$.next(true);
     }

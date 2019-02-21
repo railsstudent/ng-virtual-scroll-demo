@@ -7,6 +7,7 @@ import { IPhoto } from '../services/photos-service';
     <div class="item">
       <div class="item-detail">Album Id: {{ photo.albumId }}</div>
       <div class="item-detail">Id: {{ photo.id }}</div>
+      <div class="item-title" title="{{ photo.title }}">Title: {{ photo.title }}</div>
       <div class="item-detail">Url: {{ photo.url }}</div>
       <div class="item-thumbnailUrl">
         <span>Thumbnail:</span>
@@ -28,11 +29,19 @@ import { IPhoto } from '../services/photos-service';
         height: 20px;
       }
 
+      .item-title {
+        height: 40px;
+      }
+
       .item-thumbnailUrl {
-        height: 150px;
-        width: 150px;
+        height: 100px;
 
         display: flex;
+      }
+
+      img {
+        width: 100px;
+        height: 100px;
       }
 
       .item-thumbnailUrl > span {
