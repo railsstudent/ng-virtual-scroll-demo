@@ -30,7 +30,7 @@ import { IPhoto } from '../services/photos-service';
       }
 
       .item-title {
-        height: 60px;
+        height: 40px;
       }
 
       .item-thumbnailUrl {

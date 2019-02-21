@@ -1,8 +1,8 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { NgModule } from '@angular/core';
-import { MatListModule, MatSidenavModule } from '@angular/material';
+import { MatIconModule, MatListModule, MatSidenavModule, MatToolbarModule } from '@angular/material';
 
 @NgModule({
-  exports: [ScrollingModule, MatSidenavModule, MatListModule],
+  exports: [ScrollingModule, MatSidenavModule, MatListModule, MatToolbarModule, MatIconModule],
 })
 export class MaterialModule {}
