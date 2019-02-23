@@ -6,6 +6,10 @@ const routes: Routes = [
     path: '',
     loadChildren: './virtual-scroll-list/virtual-scroll.module#VirtualScrollModule',
   },
+  {
+    path: 'table',
+    loadChildren: './virtual-scroll-table/table.module#TableModule',
+  },
 ];
 
 @NgModule({

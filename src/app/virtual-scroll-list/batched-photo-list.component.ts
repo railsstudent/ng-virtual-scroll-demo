@@ -45,6 +45,8 @@ export class BatchedScrollPhotoListComponent implements OnInit, OnDestroy {
 
   destroy$ = new Subject();
 
+  theEnd = false;
+
   constructor(private service: PhotosService) {}
 
   ngOnInit() {
@@ -71,6 +73,11 @@ export class BatchedScrollPhotoListComponent implements OnInit, OnDestroy {
 
   getBatch$() {
     return this.service.getBatch$(this.pageOffset, 10).pipe(
+      tap((results: IPhoto[]) => {
+        if (!results.length) {
+          this.theEnd = true;
+        }
+      }),
       map((results: IPhoto[]) => {
         return results.reduce(
           (acc, r) => {
@@ -83,7 +90,11 @@ export class BatchedScrollPhotoListComponent implements OnInit, OnDestroy {
     );
   }
 
-  checkScrollEnd(e) {
+  checkScrollEnd() {
+    if (this.theEnd) {
+      return;
+    }
+
     const numItems = this.viewport.getDataLength();
     const end = this.viewport.getRenderedRange().end;
     if (end === numItems) {

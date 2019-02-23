@@ -5,7 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MaterialModule } from './material.module';
-import { ShellComponent } from './shell/shell.component';
+import { ShellComponent } from './shell';
 
 @NgModule({
   declarations: [AppComponent, ShellComponent],
