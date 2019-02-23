@@ -2,13 +2,11 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { SharedModule } from '../shared';
-import { BasicScrollPhotoListComponent } from './basic-photo-list.component';
-import { BatchedScrollPhotoListComponent } from './batched-photo-list.component';
-import { PhotoItemComponent } from './photo-list-item.component';
+import { RoutingComponents, VirtualScrollRoutingModule } from './virtual-scroll-routing.module';
 
 @NgModule({
-  declarations: [BatchedScrollPhotoListComponent, PhotoItemComponent, BasicScrollPhotoListComponent],
-  imports: [CommonModule, ScrollingModule, SharedModule],
-  exports: [BatchedScrollPhotoListComponent, PhotoItemComponent, BasicScrollPhotoListComponent],
+  declarations: RoutingComponents,
+  imports: [CommonModule, ScrollingModule, SharedModule, VirtualScrollRoutingModule],
+  exports: RoutingComponents,
 })
 export class VirtualScrollModule {}

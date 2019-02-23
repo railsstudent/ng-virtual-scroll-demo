@@ -1,0 +1,39 @@
+:host {
+  display: block;
+}
+
+// .mat-table {
+//   background: white;
+// }
+
+// .mat-header-cell,
+// .mat-cell {
+//   color: black;
+// }
+
+.mat-column {
+  &-id {
+    width: 10%;
+  }
+
+  &-albumId {
+    width: 10%;
+  }
+
+  &-title {
+    width: 40%;
+  }
+
+  &-url {
+    width: 30%;
+  }
+
+  &-thumbnailUrl {
+    width: 10%;
+
+    img {
+      width: 60px;
+      height: 60px;
+    }
+  }
+}
