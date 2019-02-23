@@ -6,6 +6,7 @@ import { IPhoto, PhotosService } from '../services/photos-service';
 @Component({
   selector: 'app-basic-photo-list',
   template: `
+    <app-title>Basic Virtual Scroll List</app-title>
     <ng-container *ngIf="(photos$ | async) as photos">
       <cdk-virtual-scroll-viewport #viewport class="viewport" [itemSize]="160">
         <div *cdkVirtualFor="let photo of photos; let i = index; trackBy: trackByIdx">
@@ -34,10 +35,10 @@ import { IPhoto, PhotosService } from '../services/photos-service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BasicScrollPhotoListComponent implements OnInit, OnDestroy {
-  constructor(private photoService: PhotosService) {}
-
   destroy$ = new Subject();
   photos$: Observable<IPhoto[]>;
+
+  constructor(private photoService: PhotosService) {}
 
   ngOnInit() {
     this.photos$ = this.photoService.getAll$().pipe(takeUntil(this.destroy$));

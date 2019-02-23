@@ -7,7 +7,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     <ng-container *ngIf="(mobileLayout$ | async) as mobileLayout">
       <mat-toolbar color="primary" class="app-toolbar">
         <button mat-icon-button (click)="snav.toggle()"><mat-icon>menu</mat-icon></button>
-        <h1 class="app-name">Virtual Scroll Demo</h1>
+        <h1 class="app-name" id="toolbar-title"></h1>
       </mat-toolbar>
       <mat-sidenav-container>
         <mat-sidenav
