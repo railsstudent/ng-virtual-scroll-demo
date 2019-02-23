@@ -6,11 +6,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MaterialModule } from './material.module';
 import { ShellComponent } from './shell/shell.component';
-import { VirtualScrollModule } from './virtual-scroll-list/';
 
 @NgModule({
   declarations: [AppComponent, ShellComponent],
-  imports: [BrowserModule, BrowserAnimationsModule, HttpClientModule, AppRoutingModule, VirtualScrollModule, MaterialModule],
+  imports: [BrowserModule, BrowserAnimationsModule, HttpClientModule, AppRoutingModule, MaterialModule],
   providers: [],
   bootstrap: [AppComponent],
 })
