@@ -7,6 +7,7 @@ import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
 @Component({
   selector: 'app-batched-photo-list',
   template: `
+    <app-title>Batched Virtual Scroll List</app-title>
     <ng-container *ngIf="(photos$ | async) as photos">
       <cdk-virtual-scroll-viewport #viewport class="viewport" [itemSize]="160" (scrolledIndexChange)="checkScrollEnd($event)">
         <div *cdkVirtualFor="let photo of photos; let i = index; trackBy: trackByIdx">
