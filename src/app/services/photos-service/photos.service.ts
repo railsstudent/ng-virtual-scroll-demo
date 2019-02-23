@@ -21,4 +21,13 @@ export class PhotosService {
       }),
     );
   }
+
+  getAll$() {
+    return this.http.get<IPhoto[]>(URL).pipe(
+      catchError((err: HttpErrorResponse) => {
+        console.error(err);
+        return of([] as IPhoto[]);
+      }),
+    );
+  }
 }

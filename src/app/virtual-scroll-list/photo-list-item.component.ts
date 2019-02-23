@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { IPhoto } from '../services/photos-service';
 
 @Component({
-  selector: 'app-virtual-scroll-list-item',
+  selector: 'app-photo-list-item',
   template: `
     <div class="item">
       <div class="item-detail">Album Id: {{ photo.albumId }}</div>
@@ -51,7 +51,7 @@ import { IPhoto } from '../services/photos-service';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VirtualScrollListItemComponent {
+export class PhotoItemComponent {
   @Input()
   photo: IPhoto;
 }

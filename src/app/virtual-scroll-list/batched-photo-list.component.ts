@@ -5,12 +5,12 @@ import { concatMap, map, scan, tap, throttleTime } from 'rxjs/operators';
 import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
 
 @Component({
-  selector: 'app-virtual-scroll-list',
+  selector: 'app-batched-photo-list',
   template: `
     <ng-container *ngIf="(photos$ | async) as photos">
       <cdk-virtual-scroll-viewport #viewport class="viewport" [itemSize]="240" (scrolledIndexChange)="checkScrollEnd($event)">
         <div *cdkVirtualFor="let photo of photos; let i = index; trackBy: trackByIdx">
-          <app-virtual-scroll-list-item [photo]="photo"></app-virtual-scroll-list-item>
+          <app-photo-list-item [photo]="photo"></app-photo-list-item>
         </div>
       </cdk-virtual-scroll-viewport>
     </ng-container>
@@ -26,7 +26,7 @@ import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VirtualScrollListComponent implements OnInit {
+export class BatchedScrollPhotoListComponent implements OnInit {
   photos$: Observable<IPhoto[]>;
   pageOffset = 1;
   nextPage$ = new BehaviorSubject<boolean>(true);
