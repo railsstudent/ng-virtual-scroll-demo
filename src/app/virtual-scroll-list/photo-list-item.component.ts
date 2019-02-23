@@ -2,11 +2,10 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { IPhoto } from '../services/photos-service';
 
 @Component({
-  selector: 'app-virtual-scroll-list-item',
+  selector: 'app-photo-list-item',
   template: `
     <div class="item">
-      <div class="item-detail">Album Id: {{ photo.albumId }}</div>
-      <div class="item-detail">Id: {{ photo.id }}</div>
+      <div class="item-detail">Id: {{ photo.id }} | Album Id: {{ photo.albumId }}</div>
       <div class="item-title" title="{{ photo.title }}">Title: {{ photo.title }}</div>
       <div class="item-detail">Url: {{ photo.url }}</div>
       <div class="item-thumbnailUrl">
@@ -26,22 +25,22 @@ import { IPhoto } from '../services/photos-service';
       }
 
       .item-detail {
-        height: 20px;
+        min-height: 20px;
       }
 
       .item-title {
-        height: 40px;
+        height: auto;
       }
 
       .item-thumbnailUrl {
-        height: 100px;
+        height: 60px;
 
         display: flex;
       }
 
       img {
-        width: 100px;
-        height: 100px;
+        width: 60px;
+        height: 60px;
       }
 
       .item-thumbnailUrl > span {
@@ -51,7 +50,7 @@ import { IPhoto } from '../services/photos-service';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VirtualScrollListItemComponent {
+export class PhotoItemComponent {
   @Input()
   photo: IPhoto;
 }

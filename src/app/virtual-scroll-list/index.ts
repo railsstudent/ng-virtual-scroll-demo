@@ -1,2 +1,3 @@
-export * from './virtual-scroll-list-item.component';
-export * from './virtual-scroll-list.component';
+export * from './basic-photo-list.component';
+export * from './batched-photo-list.component';
+export * from './virtual-scroll.module';

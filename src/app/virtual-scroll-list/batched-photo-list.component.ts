@@ -1,38 +1,48 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { concatMap, map, scan, tap, throttleTime } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { concatMap, map, scan, takeUntil, tap, throttleTime } from 'rxjs/operators';
 import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
 
 @Component({
-  selector: 'app-virtual-scroll-list',
+  selector: 'app-batched-photo-list',
   template: `
     <ng-container *ngIf="(photos$ | async) as photos">
-      <cdk-virtual-scroll-viewport #viewport class="viewport" [itemSize]="240" (scrolledIndexChange)="checkScrollEnd($event)">
+      <cdk-virtual-scroll-viewport #viewport class="viewport" [itemSize]="160" (scrolledIndexChange)="checkScrollEnd($event)">
         <div *cdkVirtualFor="let photo of photos; let i = index; trackBy: trackByIdx">
-          <app-virtual-scroll-list-item [photo]="photo"></app-virtual-scroll-list-item>
+          <app-photo-list-item [photo]="photo"></app-photo-list-item>
         </div>
       </cdk-virtual-scroll-viewport>
     </ng-container>
   `,
   styles: [
     `
+      :host {
+        color: black;
+      }
+
+      h1 {
+        padding: 0.5rem;
+      }
+
       .viewport {
         width: 100%;
         height: 100%;
-        color: black;
+        margin-left: 0.5rem;
       }
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VirtualScrollListComponent implements OnInit {
+export class BatchedScrollPhotoListComponent implements OnInit, OnDestroy {
   photos$: Observable<IPhoto[]>;
   pageOffset = 1;
   nextPage$ = new BehaviorSubject<boolean>(true);
 
   @ViewChild(CdkVirtualScrollViewport)
   viewport: CdkVirtualScrollViewport;
+
+  destroy$ = new Subject();
 
   constructor(private service: PhotosService) {}
 
@@ -54,6 +64,7 @@ export class VirtualScrollListComponent implements OnInit {
           [] as IPhoto[],
         );
       }),
+      takeUntil(this.destroy$),
     );
   }
 
@@ -79,7 +90,12 @@ export class VirtualScrollListComponent implements OnInit {
     }
   }
 
-  trackByIdx(i) {
+  trackByIdx(i: number) {
     return i;
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -1,11 +1,15 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { VirtualScrollListComponent } from './virtual-scroll-list/virtual-scroll-list.component';
+import { BasicScrollPhotoListComponent, BatchedScrollPhotoListComponent } from './virtual-scroll-list';
 
 const routes: Routes = [
   {
     path: '',
-    component: VirtualScrollListComponent,
+    component: BatchedScrollPhotoListComponent,
+  },
+  {
+    path: 'basic',
+    component: BasicScrollPhotoListComponent,
   },
 ];
 
