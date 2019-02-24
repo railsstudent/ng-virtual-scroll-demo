@@ -6,11 +6,10 @@ import { distinctUntilChanged } from 'rxjs/operators';
 @Injectable()
 export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   public scrolledIndexChange: Observable<number>;
-  scrollHeight: number;
-  scrollHeader: number;
-  indexChange = new Subject<number>();
-
-  viewport: CdkVirtualScrollViewport;
+  private scrollHeight: number;
+  private scrollHeader: number;
+  private indexChange = new Subject<number>();
+  private viewport: CdkVirtualScrollViewport;
 
   constructor() {
     this.scrolledIndexChange = this.indexChange.asObservable().pipe(distinctUntilChanged());
@@ -50,7 +49,8 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
     if (this.viewport) {
       const newIndex = Math.max(0, Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) - 2);
       viewport.setRenderedContentOffset(this.scrollHeight * newIndex);
-      this.indexChange.next(Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) + 1);
+      const nextIndex = Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) + 1;
+      this.indexChange.next(nextIndex);
     }
   }
 }

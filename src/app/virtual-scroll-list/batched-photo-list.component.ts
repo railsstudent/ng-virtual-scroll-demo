@@ -38,7 +38,7 @@ import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
 export class BatchedScrollPhotoListComponent implements OnInit, OnDestroy {
   photos$: Observable<IPhoto[]>;
   pageOffset = 1;
-  nextPage$ = new BehaviorSubject<boolean>(true);
+  private nextPage$ = new BehaviorSubject<boolean>(true);
 
   @ViewChild(CdkVirtualScrollViewport)
   viewport: CdkVirtualScrollViewport;
