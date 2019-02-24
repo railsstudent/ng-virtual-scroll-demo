@@ -6,6 +6,10 @@
   width: 100%;
 }
 
+.mat-cell {
+  border-right: rgba(255, 255, 255, 0.12) 1px solid;
+}
+
 .mat-column {
   &-id {
     width: 10%;
@@ -13,7 +17,7 @@
 
   &-albumId {
     width: 10%;
-    text-align: right;
+    text-align: center;
   }
 
   &-title {

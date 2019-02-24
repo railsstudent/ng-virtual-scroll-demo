@@ -1,7 +1,7 @@
 import { CdkVirtualScrollViewport, VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
-import { concatMap, map, scan, takeUntil, tap } from 'rxjs/operators';
+import { concatMap, map, scan, share, takeUntil, tap } from 'rxjs/operators';
 import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
 import { TableVirtualScrollStrategy } from './table-virtual-scroll-strategy';
 
@@ -24,11 +24,13 @@ export class PhotoTableComponent implements OnInit, OnDestroy {
   rowHeight = 60;
   headerHeight = 60;
   gridHeight = 0;
-  pageOffset = 401;
+  pageOffset = 1;
+  lastLoadedPageOffset = 0;
   theEnd = false;
 
   photos$: Observable<IPhoto[]>;
-  dataSource: Observable<IPhoto[]>;
+  dataSource$: Observable<IPhoto[]>;
+  photoLength$: Observable<number>;
   nextData$ = new BehaviorSubject(true);
   destroy$ = new Subject<void>();
 
@@ -46,40 +48,41 @@ export class PhotoTableComponent implements OnInit, OnDestroy {
     const range = Math.ceil(this.gridHeight / this.rowHeight) + PhotoTableComponent.BUFFER_SIZE;
     this.scrollStrategy.setScrollHeight(this.rowHeight, this.headerHeight);
     this.photos$ = this.nextData$.asObservable().pipe(
-      // tap(() => console.log('before throttleTime', this.pageOffset)),
-      // throttleTime(500),
-      tap(() => console.log('In photo$, pageOffset', this.pageOffset)),
       concatMap(() => this.getBatch$()),
       scan((acc, photos) => ({ ...acc, ...photos }), {}),
-      map((results: PhotoMap) => {
-        return Object.keys(results).reduce((acc, k) => acc.concat(results[k]), [] as IPhoto[]);
-      }),
+      tap(() => (this.lastLoadedPageOffset = this.pageOffset)),
+      map((results: PhotoMap) => Object.keys(results).reduce((acc, k) => acc.concat(results[k]), [] as IPhoto[])),
       takeUntil(this.destroy$),
     );
 
-    this.dataSource = combineLatest(this.photos$, this.scrollStrategy.scrolledIndexChange).pipe(
+    this.dataSource$ = combineLatest(this.photos$, this.scrollStrategy.scrolledIndexChange).pipe(
       map(values => {
         const [photos, index] = values;
         const start = Math.max(0, index - PhotoTableComponent.BUFFER_SIZE);
         const end = Math.min(photos.length, index + range);
-        const displayRange = photos.slice(start, end);
-        console.log('range', range, 'index', index, 'start', start, 'end', end);
-        return [end === photos.length, displayRange];
+        return [end === photos.length, photos.slice(start, end)];
       }),
       tap(values => {
         if (values[0]) {
-          console.log('old pageOffset', this.pageOffset);
-          this.pageOffset = this.pageOffset + 1;
-          this.nextData$.next(true);
+          console.log('old pageOffset', this.pageOffset, 'lastLoadedPageOffset', this.lastLoadedPageOffset);
+          if (!this.theEnd && this.pageOffset === this.lastLoadedPageOffset) {
+            this.pageOffset = this.pageOffset + 1;
+            console.log('Update pageOffset to', this.pageOffset);
+            this.nextData$.next(true);
+          } else {
+            console.log(`waiting for ${this.lastLoadedPageOffset} to finish loading...`);
+          }
         }
       }),
       map(values => values[1] as IPhoto[]),
+      share(),
       takeUntil(this.destroy$),
     );
+
+    this.photoLength$ = this.photos$.pipe(map(v => v.length));
   }
 
   getBatch$() {
-    // console.log('pageOffset', this.pageOffset);
     return this.service.getBatch$(this.pageOffset, 10).pipe(
       tap((results: IPhoto[]) => {
         if (!results.length) {
