@@ -20,7 +20,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
           <mat-nav-list>
             <a mat-list-item routerLink="/">Batched Virtual Scroll List</a>
             <a mat-list-item routerLink="/basic">Basic Virtual Scroll List</a>
-            <a mat-list-item routerLink="/table">Virtual Scroll Table (WIP)</a>
+            <a mat-list-item routerLink="/table">Virtual Scroll Table</a>
           </mat-nav-list>
         </mat-sidenav>
         <mat-sidenav-content>
