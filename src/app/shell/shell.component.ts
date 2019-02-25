@@ -40,6 +40,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
       .app-name {
         margin-left: 0.5rem;
+        font-size: 1rem;
       }
 
       mat-sidenav-container {
@@ -62,6 +63,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
         bottom: 0;
         left: 0;
         right: 0;
+      }
+
+      @media screen and (max-width: 400px) {
+        .app-name {
+          font-size: 0.8rem;
+        }
       }
     `,
   ],

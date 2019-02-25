@@ -24,7 +24,7 @@ export class PhotoTableComponent implements OnInit, OnDestroy {
   rowHeight = 60;
   headerHeight = 60;
   gridHeight = 0;
-  pageOffset = 1;
+  pageOffset = 301;
   lastLoadedPageOffset = 0;
   theEnd = false;
 
