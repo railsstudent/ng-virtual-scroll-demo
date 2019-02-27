@@ -6,6 +6,7 @@
   width: 100%;
 }
 
+.mat-header-cell,
 .mat-cell {
   border-right: rgba(255, 255, 255, 0.12) 1px solid;
 }
@@ -21,7 +22,7 @@
   }
 
   &-title {
-    width: 40%;
+    width: 35%;
   }
 
   &-url {
@@ -32,7 +33,7 @@
   }
 
   &-thumbnailUrl {
-    width: 10%;
+    width: 15%;
 
     img {
       width: 60px;

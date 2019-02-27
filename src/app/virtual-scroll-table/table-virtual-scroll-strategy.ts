@@ -11,6 +11,8 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   private indexChange = new Subject<number>();
   private viewport: CdkVirtualScrollViewport;
 
+  private readonly bufferSize = 5;
+
   constructor() {
     this.scrolledIndexChange = this.indexChange.asObservable().pipe(distinctUntilChanged());
   }
@@ -18,7 +20,6 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   attach(viewport: CdkVirtualScrollViewport): void {
     this.viewport = viewport;
     this.onDataLengthChanged();
-    this.updateContent(viewport);
   }
 
   detach(): void {}
@@ -30,6 +31,7 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   onDataLengthChanged(): void {
     if (this.viewport) {
       this.viewport.setTotalContentSize(this.viewport.getDataLength() * this.scrollHeight);
+      this.updateContent(this.viewport);
     }
   }
 
@@ -47,10 +49,17 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
 
   private updateContent(viewport: CdkVirtualScrollViewport) {
     if (this.viewport) {
-      const newIndex = Math.max(0, Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) - 2);
-      viewport.setRenderedContentOffset(this.scrollHeight * newIndex);
-      const nextIndex = Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) + 1;
-      this.indexChange.next(nextIndex);
+      const range = Math.ceil(viewport.getViewportSize() / this.scrollHeight) + this.bufferSize * 2;
+      const newIndex = Math.max(0, Math.round((viewport.measureScrollOffset() - this.scrollHeader) / this.scrollHeight) - this.bufferSize);
+      const dataLength = this.viewport.getDataLength();
+
+      const start = Math.max(0, newIndex - this.bufferSize);
+      const end = Math.min(dataLength, newIndex + range);
+
+      viewport.setRenderedContentOffset(this.scrollHeight * start);
+      viewport.setRenderedRange({ start, end });
+
+      this.indexChange.next(newIndex);
     }
   }
 }
