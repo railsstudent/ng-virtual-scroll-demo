@@ -1,7 +1,6 @@
 import { CdkVirtualScrollViewport, VirtualScrollStrategy } from '@angular/cdk/scrolling';
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { distinctUntilChanged } from 'rxjs/operators';
 
 @Injectable()
 export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
@@ -14,7 +13,7 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   private readonly bufferSize = 5;
 
   constructor() {
-    this.scrolledIndexChange = this.indexChange.asObservable().pipe(distinctUntilChanged());
+    this.scrolledIndexChange = this.indexChange.asObservable(); //.pipe(distinctUntilChanged());
   }
 
   attach(viewport: CdkVirtualScrollViewport): void {

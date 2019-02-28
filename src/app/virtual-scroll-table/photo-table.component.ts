@@ -1,7 +1,7 @@
 import { CdkVirtualScrollViewport, VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
-import { concatMap, map, scan, share, takeUntil, tap } from 'rxjs/operators';
+import { concatMap, distinctUntilChanged, map, scan, share, takeUntil, tap } from 'rxjs/operators';
 import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
 import { TableVirtualScrollStrategy } from './table-virtual-scroll-strategy';
 
@@ -17,10 +17,10 @@ import { TableVirtualScrollStrategy } from './table-virtual-scroll-strategy';
   ],
 })
 export class PhotoTableComponent implements OnInit, OnDestroy {
-  static displayedColumns: string[] = ['id', 'albumId', 'title', 'url', 'thumbnailUrl'];
   static basePageOffset = 301;
   static limit = 10;
 
+  displayedColumns = ['id', 'albumId', 'title', 'url', 'thumbnailUrl'];
   rowHeight = 60;
   headerHeight = 60;
   gridHeight = 0;
@@ -46,6 +46,8 @@ export class PhotoTableComponent implements OnInit, OnDestroy {
     this.gridHeight = this.tableViewPort.elementRef.nativeElement.clientHeight;
     this.scrollStrategy.setScrollHeight(this.rowHeight, this.headerHeight);
     this.photos$ = this.nextData$.asObservable().pipe(
+      distinctUntilChanged(),
+      tap(endOffset => console.log('endOffset', endOffset)),
       concatMap(endOffset => this.getBatch$(endOffset)),
       scan((acc, photos) => ({ ...acc, ...photos }), {}),
       map((results: PhotoMap) => Object.keys(results).reduce((acc, k) => acc.concat(results[k]), [] as IPhoto[])),
@@ -67,10 +69,8 @@ export class PhotoTableComponent implements OnInit, OnDestroy {
 
   getBatch$(endOffset: number) {
     const pageOffset = PhotoTableComponent.basePageOffset + Math.floor(endOffset / PhotoTableComponent.limit);
-    console.log('pageOffset', pageOffset);
     return this.service.getBatch$(pageOffset, PhotoTableComponent.limit).pipe(
       tap((results: IPhoto[]) => {
-        console.log('results', results);
         if (!results.length) {
           this.theEnd = true;
         }
