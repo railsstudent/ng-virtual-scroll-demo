@@ -1,5 +1,5 @@
 import { CdkVirtualScrollViewport, VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
-import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Directive, forwardRef, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { concatMap, distinctUntilChanged, map, scan, share, takeUntil, tap } from 'rxjs/operators';
 import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
@@ -9,12 +9,6 @@ import { TableVirtualScrollStrategy } from './table-virtual-scroll-strategy';
   selector: 'app-photo-table',
   templateUrl: './photo-table.component.html',
   styleUrls: ['./photo-table.component.scss'],
-  providers: [
-    {
-      provide: VIRTUAL_SCROLL_STRATEGY,
-      useClass: TableVirtualScrollStrategy,
-    },
-  ],
 })
 export class PhotoTableComponent implements OnInit, OnDestroy {
   static basePageOffset = 301;
@@ -36,15 +30,10 @@ export class PhotoTableComponent implements OnInit, OnDestroy {
   @ViewChild(CdkVirtualScrollViewport)
   tableViewPort: CdkVirtualScrollViewport;
 
-  constructor(
-    @Inject(VIRTUAL_SCROLL_STRATEGY)
-    private scrollStrategy: TableVirtualScrollStrategy,
-    private service: PhotosService,
-  ) {}
+  constructor(private service: PhotosService) {}
 
   ngOnInit() {
     this.gridHeight = this.tableViewPort.elementRef.nativeElement.clientHeight;
-    this.scrollStrategy.setScrollHeight(this.rowHeight, this.headerHeight);
     this.photos$ = this.nextData$.asObservable().pipe(
       distinctUntilChanged(),
       tap(endOffset => console.log('endOffset', endOffset)),
@@ -104,5 +93,33 @@ export class PhotoTableComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+}
+
+export function scrollStrategyFactory(scroll: TableFixedSizeVirtualScrollDirective) {
+  return scroll.scrollStrategy;
+}
+
+@Directive({
+  selector: '[tableFixedSizeVirtualScroll]',
+  providers: [
+    {
+      provide: VIRTUAL_SCROLL_STRATEGY,
+      useFactory: scrollStrategyFactory,
+      deps: [forwardRef(() => TableFixedSizeVirtualScrollDirective)],
+    },
+  ],
+})
+export class TableFixedSizeVirtualScrollDirective implements OnChanges {
+  @Input()
+  scrollHeight: number;
+
+  @Input()
+  scrollHeader: number;
+
+  scrollStrategy = new TableVirtualScrollStrategy(this.scrollHeight, this.scrollHeader);
+
+  ngOnChanges() {
+    this.scrollStrategy.setScrollHeight(this.scrollHeight, this.scrollHeader);
   }
 }

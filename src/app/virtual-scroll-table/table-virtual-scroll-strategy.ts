@@ -5,14 +5,12 @@ import { Observable, Subject } from 'rxjs';
 @Injectable()
 export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   public scrolledIndexChange: Observable<number>;
-  private scrollHeight: number;
-  private scrollHeader: number;
   private indexChange = new Subject<number>();
   private viewport: CdkVirtualScrollViewport;
 
   private readonly bufferSize = 5;
 
-  constructor() {
+  constructor(private scrollHeight: number, private scrollHeader: number) {
     this.scrolledIndexChange = this.indexChange.asObservable(); //.pipe(distinctUntilChanged());
   }
 

@@ -1,20 +1,25 @@
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { concatMap, map, scan, takeUntil, tap, throttleTime } from 'rxjs/operators';
+import { concatMap, map, scan, share, takeUntil, tap, throttleTime } from 'rxjs/operators';
 import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
 
 @Component({
   selector: 'app-batched-photo-list',
   template: `
-    <app-title>Batched Virtual Scroll List</app-title>
+    <app-title *ngIf="(isSmallScreen$ | async); else large">Batched List (No. of records: {{ photoCount$ | async }})</app-title>
     <ng-container *ngIf="(photos$ | async) as photos">
       <cdk-virtual-scroll-viewport #viewport class="viewport" [itemSize]="160" (scrolledIndexChange)="checkScrollEnd($event)">
-        <div *cdkVirtualFor="let photo of photos; let i = index; trackBy: trackByIdx">
+        <div *cdkVirtualFor="let photo of photos; let i = index; trackBy: trackByIdx" class="animated fadeInRight slow">
           <app-photo-list-item [photo]="photo"></app-photo-list-item>
         </div>
       </cdk-virtual-scroll-viewport>
     </ng-container>
+
+    <ng-template #large>
+      <app-title>Batched Virtual Scroll List (No. of records: {{ photoCount$ | async }})</app-title>
+    </ng-template>
   `,
   styles: [
     `
@@ -37,6 +42,7 @@ import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
 })
 export class BatchedScrollPhotoListComponent implements OnInit, OnDestroy {
   photos$: Observable<IPhoto[]>;
+  photoCount$: Observable<number>;
   pageOffset = 301;
   private nextPage$ = new BehaviorSubject<boolean>(true);
 
@@ -47,7 +53,9 @@ export class BatchedScrollPhotoListComponent implements OnInit, OnDestroy {
 
   theEnd = false;
 
-  constructor(private service: PhotosService) {}
+  isSmallScreen$: Observable<boolean>;
+
+  constructor(private service: PhotosService, private breakpointObserver: BreakpointObserver) {}
 
   ngOnInit() {
     const batchMap$ = this.nextPage$.asObservable().pipe(
@@ -67,8 +75,13 @@ export class BatchedScrollPhotoListComponent implements OnInit, OnDestroy {
           [] as IPhoto[],
         );
       }),
+      share(),
       takeUntil(this.destroy$),
     );
+
+    this.photoCount$ = this.photos$.pipe(map(p => p.length));
+
+    this.isSmallScreen$ = this.breakpointObserver.observe(['(max-width: 400px)']).pipe(map(x => x.matches));
   }
 
   getBatch$() {
