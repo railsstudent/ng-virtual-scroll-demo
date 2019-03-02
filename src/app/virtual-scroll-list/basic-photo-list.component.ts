@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { map, share, takeUntil } from 'rxjs/operators';
 import { IPhoto, PhotosService } from '../services/photos-service';
 
 @Component({
   selector: 'app-basic-photo-list',
   template: `
-    <app-title>Basic Virtual Scroll List</app-title>
+    <app-title>Basic Virtual Scroll List (No. of records: {{ photoCount$ | async }})</app-title>
     <ng-container *ngIf="(photos$ | async) as photos">
       <cdk-virtual-scroll-viewport #viewport class="viewport" [itemSize]="160">
-        <div *cdkVirtualFor="let photo of photos; let i = index; trackBy: trackByIdx">
+        <div *cdkVirtualFor="let photo of photos; let i = index; trackBy: trackByIdx" class="animated fadeInRight slow">
           <app-photo-list-item [photo]="photo"></app-photo-list-item>
         </div>
       </cdk-virtual-scroll-viewport>
@@ -37,11 +37,16 @@ import { IPhoto, PhotosService } from '../services/photos-service';
 export class BasicScrollPhotoListComponent implements OnInit, OnDestroy {
   destroy$ = new Subject();
   photos$: Observable<IPhoto[]>;
+  photoCount$: Observable<number>;
 
   constructor(private photoService: PhotosService) {}
 
   ngOnInit() {
-    this.photos$ = this.photoService.getAll$().pipe(takeUntil(this.destroy$));
+    this.photos$ = this.photoService.getAll$().pipe(
+      share(),
+      takeUntil(this.destroy$),
+    );
+    this.photoCount$ = this.photos$.pipe(map(p => p.length));
   }
 
   ngOnDestroy() {

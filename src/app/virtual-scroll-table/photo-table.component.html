@@ -1,5 +1,11 @@
 <app-title>Virtual Scroll Table (Number of records: {{ photoLength$ | async }})</app-title>
-<cdk-virtual-scroll-viewport (scrolledIndexChange)="nextBatch$()" [style.height.px]="gridHeight">
+<cdk-virtual-scroll-viewport
+  (scrolledIndexChange)="nextBatch$()"
+  [style.height.px]="gridHeight"
+  tableFixedSizeVirtualScroll
+  [scrollHeight]="60"
+  [scrollHeader]="60"
+>
   <mat-table [dataSource]="dataSource$" class="mat-elevation-z8">
     <!--- Note that these columns can be defined in any order.
         The actual rendered columns are set as a property on the row definition" -->
@@ -33,7 +39,7 @@
 
     <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" [style.top.px]="scrollPosition"></mat-header-row>
     <ng-template let-row matRowDef cdkVirtualFor [matRowDefColumns]="displayedColumns" [cdkVirtualForOf]="photos$ | async">
-      <mat-row></mat-row>
+      <mat-row class="animated fadeInRight slow"></mat-row>
     </ng-template>
   </mat-table>
 </cdk-virtual-scroll-viewport>
