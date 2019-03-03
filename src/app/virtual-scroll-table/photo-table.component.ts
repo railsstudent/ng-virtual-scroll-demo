@@ -1,22 +1,37 @@
 import { CdkVirtualScrollViewport, VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
-import { Component, Directive, forwardRef, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Directive, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { concatMap, distinctUntilChanged, map, scan, share, takeUntil, tap } from 'rxjs/operators';
 import { IPhoto, PhotoMap, PhotosService } from '../services/photos-service';
 import { TableVirtualScrollStrategy } from './table-virtual-scroll-strategy';
 
+@Directive({
+  selector: '[tableFixedSizeVirtualScroll]',
+})
+export class TableFixedSizeVirtualScrollDirective {
+  @Input()
+  scrollHeight = 0;
+
+  @Input()
+  scrollHeader = 0;
+}
+
 @Component({
   selector: 'app-photo-table',
   templateUrl: './photo-table.component.html',
   styleUrls: ['./photo-table.component.scss'],
+  providers: [
+    {
+      provide: VIRTUAL_SCROLL_STRATEGY,
+      useClass: TableVirtualScrollStrategy,
+    },
+  ],
 })
-export class PhotoTableComponent implements OnInit, OnDestroy {
+export class PhotoTableComponent implements OnInit, OnDestroy, AfterViewInit {
   static basePageOffset = 301;
   static limit = 10;
 
   displayedColumns = ['id', 'albumId', 'title', 'url', 'thumbnailUrl'];
-  rowHeight = 60;
-  headerHeight = 60;
   gridHeight = 0;
   theEnd = false;
   scrollPosition = 0;
@@ -30,7 +45,10 @@ export class PhotoTableComponent implements OnInit, OnDestroy {
   @ViewChild(CdkVirtualScrollViewport)
   tableViewPort: CdkVirtualScrollViewport;
 
-  constructor(private service: PhotosService) {}
+  @ViewChild(TableFixedSizeVirtualScrollDirective)
+  tableFixedSizeDirective: TableFixedSizeVirtualScrollDirective;
+
+  constructor(@Inject(VIRTUAL_SCROLL_STRATEGY) private scrollStrategy: TableVirtualScrollStrategy, private service: PhotosService) {}
 
   ngOnInit() {
     this.gridHeight = this.tableViewPort.elementRef.nativeElement.clientHeight;
@@ -54,6 +72,11 @@ export class PhotoTableComponent implements OnInit, OnDestroy {
     );
 
     this.photoLength$ = this.photos$.pipe(map(v => v.length));
+  }
+
+  ngAfterViewInit(): void {
+    const { scrollHeight, scrollHeader } = this.tableFixedSizeDirective;
+    this.scrollStrategy.setScrollHeight(scrollHeight, scrollHeader);
   }
 
   getBatch$(endOffset: number) {
@@ -93,33 +116,5 @@ export class PhotoTableComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-}
-
-export function scrollStrategyFactory(scroll: TableFixedSizeVirtualScrollDirective) {
-  return scroll.scrollStrategy;
-}
-
-@Directive({
-  selector: '[tableFixedSizeVirtualScroll]',
-  providers: [
-    {
-      provide: VIRTUAL_SCROLL_STRATEGY,
-      useFactory: scrollStrategyFactory,
-      deps: [forwardRef(() => TableFixedSizeVirtualScrollDirective)],
-    },
-  ],
-})
-export class TableFixedSizeVirtualScrollDirective implements OnChanges {
-  @Input()
-  scrollHeight: number;
-
-  @Input()
-  scrollHeader: number;
-
-  scrollStrategy = new TableVirtualScrollStrategy(this.scrollHeight, this.scrollHeader);
-
-  ngOnChanges() {
-    this.scrollStrategy.setScrollHeight(this.scrollHeight, this.scrollHeader);
   }
 }

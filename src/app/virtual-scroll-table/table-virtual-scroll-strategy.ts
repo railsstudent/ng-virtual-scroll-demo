@@ -2,15 +2,19 @@ import { CdkVirtualScrollViewport, VirtualScrollStrategy } from '@angular/cdk/sc
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   public scrolledIndexChange: Observable<number>;
   private indexChange = new Subject<number>();
   private viewport: CdkVirtualScrollViewport;
+  private scrollHeight: number;
+  private scrollHeader: number;
 
   private readonly bufferSize = 5;
 
-  constructor(private scrollHeight: number, private scrollHeader: number) {
+  constructor() {
     this.scrolledIndexChange = this.indexChange.asObservable(); //.pipe(distinctUntilChanged());
   }
 
