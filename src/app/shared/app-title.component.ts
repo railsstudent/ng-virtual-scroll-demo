@@ -1,4 +1,5 @@
 import { CdkPortal, DomPortalHost, PortalHost } from '@angular/cdk/portal';
+import { DOCUMENT } from '@angular/common';
 import {
   AfterViewInit,
   ApplicationRef,
@@ -10,7 +11,6 @@ import {
   OnDestroy,
   ViewChild,
 } from '@angular/core';
-import { DOCUMENT } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-title',
