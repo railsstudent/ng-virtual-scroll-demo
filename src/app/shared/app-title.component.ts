@@ -5,10 +5,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   ComponentFactoryResolver,
+  Inject,
   Injector,
   OnDestroy,
   ViewChild,
 } from '@angular/core';
+import { DOCUMENT } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-title',
@@ -26,11 +28,16 @@ export class AppTitleComponent implements AfterViewInit, OnDestroy {
   @ViewChild(CdkPortal)
   portal: CdkPortal;
 
-  constructor(private componentFactoryResolver: ComponentFactoryResolver, private injector: Injector, private appRef: ApplicationRef) {}
+  constructor(
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private injector: Injector,
+    private appRef: ApplicationRef,
+    @Inject(DOCUMENT) private document: Document,
+  ) {}
 
   ngAfterViewInit() {
     this.portalHost = new DomPortalHost(
-      document.querySelector('#toolbar-title'),
+      this.document.querySelector('#toolbar-title'),
       this.componentFactoryResolver,
       this.appRef,
       this.injector,
